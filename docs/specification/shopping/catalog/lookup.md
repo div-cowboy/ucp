@@ -159,6 +159,10 @@ narrowing: the core product detail page interaction where a user progressively s
   options from the **end** of this list first, keeping higher-priority selections
   intact. Optional; if omitted, the server uses its own relaxation heuristic.
 
+If `selected` repeats an option name with different labels, the Business MUST
+reject the request as invalid (HTTP 400 for REST, JSON-RPC `-32602` for MCP).
+Repeating an identical selection is equivalent to sending it once.
+
 #### Output: Effective Selections
 
 The response MUST include `product.selected` when the product has

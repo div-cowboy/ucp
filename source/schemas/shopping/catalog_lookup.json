@@ -110,7 +110,7 @@
           "items": {
             "$ref": "types/selected_option.json"
           },
-          "description": "Partial or full option selections for interactive variant narrowing. When provided, response option values include availability signals (available, exists) relative to these selections."
+          "description": "Partial or full option selections for interactive variant narrowing. When provided, response option values include availability signals (available, exists) relative to these selections. Each option name MUST appear at most once. Repeating an identical selection is equivalent to sending it once. If the same option name appears with conflicting labels, the Business MUST reject the request as invalid (HTTP 400 for REST, JSON-RPC -32602 for MCP)."
         },
         "preferences": {
           "type": "array",

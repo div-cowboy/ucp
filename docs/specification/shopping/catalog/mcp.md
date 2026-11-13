@@ -800,3 +800,4 @@ A conforming MCP transport implementation **MUST**:
 7. Support cursor-based pagination for Search according to the shared
     pagination contract (see [Pagination](search.md#pagination)).
 8. Return `-32602` (Invalid params) for requests exceeding batch size limits.
+9. Return `-32602` (Invalid params) for `get_product` requests that repeat an option name with conflicting labels. Identical repeated selections MUST be treated as a single selection.
