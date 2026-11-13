@@ -943,6 +943,10 @@ Compliance and legal links (e.g., Privacy Policy, Terms of Service).
 
 {{ schema_fields('types/message_warning', 'lodging/booking') }}
 
+### Protocol Error
+
+{{ schema_fields('types/protocol_error', 'lodging/booking') }}
+
 ### Occupancy
 
 Requested adult and child guest count breakdown for a stay.

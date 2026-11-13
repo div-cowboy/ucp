@@ -1117,6 +1117,14 @@ For MCP over HTTP, the HTTP status code is the primary signal; the JSON-RPC
 `Retry-After` header (REST) or `error.data.retry_after` (MCP) for 429 and 503
 responses.
 
+REST protocol-error responses **MAY** omit a body. When a JSON body is present,
+it **MUST** use the protocol-error schema (`code`, `content`, and optional
+`continue_url`). That shape is distinct from the business-outcome
+[error response](../reference.md#error-response) envelope (`ucp` + `messages`),
+which is used on HTTP 200/201 when no resource can be returned.
+
+{{ schema_fields('types/protocol_error', 'overview') }}
+
 The Embedded Protocol uses the same JSON-RPC error codes for peer-to-peer
 communication between host and embedded context. Server-specific scenarios
 (rate limiting, idempotency) do not apply to the embedded transport. See
@@ -1141,7 +1149,8 @@ task through the standard web interface.
 
     **Discovery Failure (424):**
 
-    ```http
+    <!-- ucp:example schema=common/types/protocol_error op=read -->
+    ```json
     HTTP/1.1 424 Failed Dependency
     Content-Type: application/json
 
@@ -1152,9 +1161,24 @@ task through the standard web interface.
     }
     ```
 
+    **Invalid Profile URL (400):**
+
+    <!-- ucp:example schema=common/types/protocol_error op=read -->
+    ```json
+    HTTP/1.1 400 Bad Request
+    Content-Type: application/json
+
+    {
+      "code": "invalid_profile_url",
+      "content": "UCP-Agent profile URL is malformed or unresolvable",
+      "continue_url": "https://merchant.com/cart"
+    }
+    ```
+
     **Version Unsupported (422):**
 
-    ```http
+    <!-- ucp:example schema=common/types/protocol_error op=read -->
+    ```json
     HTTP/1.1 422 Unprocessable Content
     Content-Type: application/json
 
@@ -1167,7 +1191,8 @@ task through the standard web interface.
 
     **Capabilities Incompatible (200):**
 
-    ```http
+    <!-- ucp:example schema=common/types/error_response op=read -->
+    ```json
     HTTP/1.1 200 OK
     Content-Type: application/json
 
@@ -1204,7 +1229,9 @@ task through the standard web interface.
     ```
 
     Protocol errors use standard HTTP status codes and headers. Response bodies
-    are optional.
+    are optional. When a JSON body is present, it uses the protocol-error schema
+    (`code`, `content`, optional `continue_url`), not the business-outcome
+    `error_response` envelope.
 
 === "MCP"
 
@@ -3617,18 +3644,17 @@ Response with version confirmation:
 }
 ```
 
-Version unsupported error — no resource is created:
+Version unsupported error — no resource is created. This is a transport
+error (HTTP 422), not a business-outcome envelope:
 
-<!-- ucp:example schema=common/types/error_response op=read -->
+<!-- ucp:example schema=common/types/protocol_error op=read -->
 ```json
+HTTP/1.1 422 Unprocessable Content
+Content-Type: application/json
+
 {
-  "ucp": { "version": "{{ ucp_version }}", "status": "error" },
-  "messages": [{
-    "type": "error",
-    "code": "version_unsupported",
-    "content": "Version 2026-01-12 is not supported. This business implements version {{ ucp_version }}.",
-    "severity": "unrecoverable"
-  }],
+  "code": "version_unsupported",
+  "content": "Version 2026-01-12 is not supported. This business implements version {{ ucp_version }}.",
   "continue_url": "https://merchant.com/"
 }
 ```

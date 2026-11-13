@@ -94,6 +94,33 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/bad_request"
+          },
+          "401": {
+            "$ref": "#/components/responses/unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/forbidden"
+          },
+          "409": {
+            "$ref": "#/components/responses/idempotency_conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/unprocessable_content"
+          },
+          "424": {
+            "$ref": "#/components/responses/failed_dependency"
+          },
+          "429": {
+            "$ref": "#/components/responses/too_many_requests"
+          },
+          "500": {
+            "$ref": "#/components/responses/internal_error"
+          },
+          "503": {
+            "$ref": "#/components/responses/service_unavailable"
           }
         }
       }
@@ -164,6 +191,30 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/bad_request"
+          },
+          "401": {
+            "$ref": "#/components/responses/unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/forbidden"
+          },
+          "422": {
+            "$ref": "#/components/responses/unprocessable_content"
+          },
+          "424": {
+            "$ref": "#/components/responses/failed_dependency"
+          },
+          "429": {
+            "$ref": "#/components/responses/too_many_requests"
+          },
+          "500": {
+            "$ref": "#/components/responses/internal_error"
+          },
+          "503": {
+            "$ref": "#/components/responses/service_unavailable"
           }
         }
       },
@@ -243,6 +294,33 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/bad_request"
+          },
+          "401": {
+            "$ref": "#/components/responses/unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/forbidden"
+          },
+          "409": {
+            "$ref": "#/components/responses/idempotency_conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/unprocessable_content"
+          },
+          "424": {
+            "$ref": "#/components/responses/failed_dependency"
+          },
+          "429": {
+            "$ref": "#/components/responses/too_many_requests"
+          },
+          "500": {
+            "$ref": "#/components/responses/internal_error"
+          },
+          "503": {
+            "$ref": "#/components/responses/service_unavailable"
           }
         }
       }
@@ -329,6 +407,33 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/bad_request"
+          },
+          "401": {
+            "$ref": "#/components/responses/unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/forbidden"
+          },
+          "409": {
+            "$ref": "#/components/responses/idempotency_conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/unprocessable_content"
+          },
+          "424": {
+            "$ref": "#/components/responses/failed_dependency"
+          },
+          "429": {
+            "$ref": "#/components/responses/too_many_requests"
+          },
+          "500": {
+            "$ref": "#/components/responses/internal_error"
+          },
+          "503": {
+            "$ref": "#/components/responses/service_unavailable"
           }
         }
       }
@@ -405,6 +510,33 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/bad_request"
+          },
+          "401": {
+            "$ref": "#/components/responses/unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/forbidden"
+          },
+          "409": {
+            "$ref": "#/components/responses/idempotency_conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/unprocessable_content"
+          },
+          "424": {
+            "$ref": "#/components/responses/failed_dependency"
+          },
+          "429": {
+            "$ref": "#/components/responses/too_many_requests"
+          },
+          "500": {
+            "$ref": "#/components/responses/internal_error"
+          },
+          "503": {
+            "$ref": "#/components/responses/service_unavailable"
           }
         }
       }
@@ -564,7 +696,129 @@
         "description": "Body digest per RFC 9530 for response."
       }
     },
+    "responses": {
+      "bad_request": {
+        "description": "The request was invalid or cannot be served (malformed input, invalid_profile_url, digest_mismatch, or algorithm_unsupported). When a JSON body is present, it uses the protocol-error schema.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../../schemas/common/types/protocol_error.json"
+            }
+          }
+        }
+      },
+      "unauthorized": {
+        "description": "Authentication is required and is missing or invalid.",
+        "headers": {
+          "WWW-Authenticate": {
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Authentication challenge describing how to obtain valid credentials."
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../../schemas/common/types/protocol_error.json"
+            }
+          }
+        }
+      },
+      "forbidden": {
+        "description": "The caller is authenticated but is not authorized to perform this operation.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../../schemas/common/types/protocol_error.json"
+            }
+          }
+        }
+      },
+      "idempotency_conflict": {
+        "description": "The Idempotency-Key was previously used with a different request payload. The operation was not executed.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../../schemas/common/types/protocol_error.json"
+            }
+          }
+        }
+      },
+      "unprocessable_content": {
+        "description": "The agent profile is malformed or the protocol version is unsupported.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../../schemas/common/types/protocol_error.json"
+            }
+          }
+        }
+      },
+      "failed_dependency": {
+        "description": "The agent profile URL is valid but fetching the profile failed.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../../schemas/common/types/protocol_error.json"
+            }
+          }
+        }
+      },
+      "too_many_requests": {
+        "description": "Rate limit exceeded.",
+        "headers": {
+          "Retry-After": {
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Seconds to wait before retrying, or an HTTP-date. SHOULD be included for 429 and 503."
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../../schemas/common/types/protocol_error.json"
+            }
+          }
+        }
+      },
+      "internal_error": {
+        "description": "The server encountered an unexpected condition before it could complete the operation.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../../schemas/common/types/protocol_error.json"
+            }
+          }
+        }
+      },
+      "service_unavailable": {
+        "description": "The server is temporarily unable to handle the request.",
+        "headers": {
+          "Retry-After": {
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Seconds to wait before retrying, or an HTTP-date. SHOULD be included for 429 and 503."
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../../schemas/common/types/protocol_error.json"
+            }
+          }
+        }
+      }
+    },
     "schemas": {
+      "protocol_error": {
+        "$ref": "../../schemas/common/types/protocol_error.json"
+      },
       "booking": {
         "$ref": "../../schemas/lodging/booking.json"
       },

@@ -1462,3 +1462,7 @@ when provided.
 ### Error Response <span id="error-response"></span>
 
 {{ schema_fields('types/error_response', 'shopping/checkout') }}
+
+### Protocol Error <span id="protocol-error"></span>
+
+{{ schema_fields('types/protocol_error', 'shopping/checkout') }}

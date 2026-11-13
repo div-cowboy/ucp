@@ -620,6 +620,90 @@ def test_scaffold_resolution() -> None:
   )
 
 
+def test_protocol_error_examples_match_schema() -> None:
+  """Documented protocol-error bodies match protocol_error, not error_response.
+
+  The overview REST examples use `{code, content, continue_url?}`. That shape
+  cannot satisfy `common/types/error_response.json` (which requires `ucp` and
+  `messages`). After the protocol-error schema lands, the same payload
+  validates.
+  """
+  if not _has_ucp_schema():
+    _check(
+      "protocol_error_examples_match_schema",
+      False,
+      "SKIPPED: ucp-schema binary not on PATH",
+    )
+    return
+
+  protocol_body = (
+    "{\n"
+    '  "code": "profile_unreachable",\n'
+    '  "content": "Unable to fetch agent profile: connection timeout",\n'
+    '  "continue_url": "https://merchant.com/cart"\n'
+    "}\n"
+  )
+  http_wrapped = (
+    "HTTP/1.1 424 Failed Dependency\n"
+    "Content-Type: application/json\n"
+    "\n"
+    f"{protocol_body}"
+  )
+  business_envelope = (
+    "{\n"
+    '  "ucp": { "version": "{{ ucp_version }}", "status": "error" },\n'
+    '  "messages": [\n'
+    "    {\n"
+    '      "type": "error",\n'
+    '      "code": "profile_unreachable",\n'
+    '      "content": "Unable to fetch agent profile: connection timeout",\n'
+    '      "severity": "unrecoverable"\n'
+    "    }\n"
+    "  ]\n"
+    "}\n"
+  )
+
+  result = _process(
+    "<!-- ucp:example schema=common/types/error_response op=read -->\n"
+    f"```json\n{protocol_body}```\n"
+  )
+  _check(
+    "protocol_error_body_rejected_by_error_response",
+    result.status == "fail",
+    f"got {result.status}: {result.message}",
+  )
+
+  result = _process(
+    "<!-- ucp:example schema=common/types/protocol_error op=read -->\n"
+    f"```json\n{protocol_body}```\n"
+  )
+  _check(
+    "protocol_error_body_accepted_by_protocol_error",
+    result.status == "ok",
+    f"got {result.status}: {result.message}",
+  )
+
+  result = _process(
+    "<!-- ucp:example schema=common/types/protocol_error op=read -->\n"
+    f"```json\n{http_wrapped}```\n"
+  )
+  _check(
+    "protocol_error_http_example_accepted",
+    result.status == "ok",
+    f"got {result.status}: {result.message}",
+  )
+
+  result = _process(
+    "<!-- ucp:example schema=common/types/protocol_error op=read -->\n"
+    f"```json\n{business_envelope}```\n"
+  )
+  _check(
+    "error_response_envelope_rejected_by_protocol_error",
+    result.status == "fail",
+    f"got {result.status}: {result.message}",
+  )
+
+
 def test_process_block_integration() -> None:
   """End-to-end through process_block. Requires ucp-schema on PATH."""
   if not _has_ucp_schema():
@@ -1216,6 +1300,7 @@ def main() -> int:
   test_resolve_schema_cache_key()
   test_parallel_validation_keeps_order_and_single_resolve()
   test_process_block_integration()
+  test_protocol_error_examples_match_schema()
   test_extension_validation()
   test_checkout_item_source_process_block()
   test_checkout_item_source()

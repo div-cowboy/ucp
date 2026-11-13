@@ -613,14 +613,22 @@ UCP uses a two-layer error model separating transport errors from business outco
 
 ### Transport Errors
 
-Use HTTP status codes for protocol-level issues that prevent request processing:
+Use HTTP status codes for protocol-level issues that prevent request processing.
+See the [Core Specification](../../overview/index.md#error-handling) for the
+complete status-code registry. When a JSON body is present on a non-2xx
+response, it **MUST** use the protocol-error schema (`code`, `content`,
+optional `continue_url`):
 
 | Status | Meaning |
 | :--- | :--- |
-| 400 | Bad Request - Malformed JSON or missing required parameters |
+| 400 | Bad Request - Malformed JSON, missing required parameters, or `invalid_profile_url` |
 | 401 | Unauthorized - Missing or invalid authentication |
+| 403 | Forbidden - Authenticated but insufficient permissions |
+| 422 | Unprocessable Content - Profile malformed or `version_unsupported` |
+| 424 | Failed Dependency - Profile URL resolved but fetch failed |
 | 429 | Too Many Requests - Rate limited |
 | 500 | Internal Server Error |
+| 503 | Service Unavailable |
 
 ### Business Outcomes
 
@@ -679,6 +687,10 @@ Business outcomes use the standard HTTP 200 status with messages in the response
 ### Error Response {: #error-response }
 
 {{ schema_fields('types/error_response', 'shopping/catalog/rest') }}
+
+### Protocol Error {: #protocol-error }
+
+{{ schema_fields('types/protocol_error', 'shopping/catalog/rest') }}
 
 ## Conformance
 

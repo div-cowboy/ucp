@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ucp.dev/schemas/common/types/protocol_error.json",
+  "title": "Protocol Error",
+  "description": "Transport-level protocol error body for non-2xx REST responses. Distinct from error_response.json, which is the business-outcome envelope used on HTTP 200/201 when no resource can be returned. Protocol-error bodies are optional; when present they use this shape (`code`, `content`, and optional `continue_url`).",
+  "type": "object",
+  "required": ["code", "content"],
+  "properties": {
+    "code": {
+      "$ref": "error_code.json",
+      "description": "Protocol error code identifying the transport-level failure (for example profile_unreachable, version_unsupported, invalid_profile_url)."
+    },
+    "content": {
+      "type": "string",
+      "description": "Human-readable description of the protocol failure."
+    },
+    "continue_url": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL for buyer handoff or session recovery when discovery or negotiation fails."
+    }
+  },
+  "examples": [
+    {
+      "code": "profile_unreachable",
+      "content": "Unable to fetch agent profile: connection timeout",
+      "continue_url": "https://merchant.com/cart"
+    },
+    {
+      "code": "version_unsupported",
+      "content": "Protocol version 2026-01-12 is not supported. This business supports versions 2026-01-11 and 2026-01-23.",
+      "continue_url": "https://merchant.com/cart"
+    }
+  ]
+}
