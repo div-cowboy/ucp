@@ -1405,6 +1405,24 @@ def test_inline_object_subsection_extraction(macros: dict) -> None:
       "(site:specification/reference/#shopping-types-expectation)]"
     ),
   )
+  _check_eq(
+    "inline_object_order_discounts_link",
+    _type_cell(order, "discounts"),
+    "[Order Discounts](#order-discounts)",
+  )
+  _check(
+    "inline_object_order_discounts_heading",
+    "#### Order Discounts" in order,
+    f"missing heading in {order!r}",
+  )
+  _check_eq(
+    "inline_object_order_discounts_applied_named",
+    _type_cell(order, "applied"),
+    (
+      "Array[[Discount Applied Discount]"
+      "(site:specification/reference/#shopping-discount-applied-discount)]"
+    ),
+  )
 
   variant = macros["schema_fields"]("types/variant", "reference")
   _check_eq(

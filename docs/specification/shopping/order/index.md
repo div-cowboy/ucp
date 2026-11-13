@@ -117,6 +117,25 @@ underlying contract.
 Businesses MAY surface a snapshot of the policies that applied at checkout on
 the order. See [Policies](../../overview/index.md#policies) for the underlying contract.
 
+### Discounts
+
+Businesses MAY surface a snapshot of the discounts that were applied at
+checkout on the order. Read-only on the order — agents do not write
+`order.discounts`. The snapshot reuses the checkout
+[`discounts.applied`](../extensions/discount.md#applied-discount) shape
+(`code`, `title`, `amount`, `allocations`), so no new concept is introduced.
+
+`totals` remains the money math (a `discount` or `items_discount` entry).
+`discounts.applied` adds attribution: which code or automatic discount
+produced each reduction. Amounts in `discounts.applied` are positive; the
+corresponding `totals` entries are negative. When both are present, the sum
+of `discounts.applied[].amount` equals the absolute value of the order's
+`discount` and `items_discount` total entries. See
+[Discount Extension — Impact on Line Items and Totals](../extensions/discount.md#impact-on-line-items-and-totals).
+
+A business that does not apply code-based or automatic discounts, or that
+did not retain the applied-discount record, omits `discounts`.
+
 ### Adjustments
 
 **Adjustments** are post-order events that exist independently of
@@ -300,6 +319,93 @@ Examples: `refund`, `return`, `credit`, `price_adjustment`, `dispute`,
     { "type": "fulfillment", "amount": 1200 },
     { "type": "tax", "amount": 1142 },
     { "type": "total", "amount": 15342 }
+  ]
+}
+```
+
+The example above has no `discounts` field. That payload remains valid:
+`discounts` is optional, and businesses that do not apply or retain
+code-based discounts omit it.
+
+## Example: applied discounts
+
+An order that snapshotted the checkout's applied discounts. `SAVE10` reduced
+the shoes line by $2.50; `applied[].amount` is the positive magnitude, and
+the `items_discount` totals are the signed receipt effect. Their absolute
+values match:
+
+<!-- ucp:example schema=shopping/order op=read -->
+```json
+{
+  "ucp": {
+    "version": "{{ ucp_version }}",
+    "capabilities": {
+      "dev.ucp.shopping.order": [{"version": "{{ ucp_version }}"}]
+    }
+  },
+  "id": "order_abc123",
+  "checkout_id": "checkout_xyz789",
+  "permalink_url": "https://business.example.com/orders/abc123",
+  "currency": "USD",
+  "line_items": [
+    {
+      "id": "li_shoes",
+      "item": { "id": "prod_shoes", "title": "Running Shoes", "price": 3000 },
+      "quantity": { "original": 1, "total": 1, "fulfilled": 1 },
+      "totals": [
+        {"type": "subtotal", "amount": 3000},
+        {"type": "items_discount", "amount": -250},
+        {"type": "total", "amount": 2750}
+      ],
+      "status": "fulfilled"
+    }
+  ],
+  "fulfillment": {
+    "expectations": [
+      {
+        "id": "exp_1",
+        "line_items": [{ "id": "li_shoes", "quantity": 1 }],
+        "method_type": "shipping",
+        "destination": {
+          "street_address": "123 Main St",
+          "address_locality": "Austin",
+          "address_region": "TX",
+          "address_country": "US",
+          "postal_code": "78701"
+        },
+        "description": "Delivered"
+      }
+    ],
+    "events": [
+      {
+        "id": "evt_1",
+        "occurred_at": "2025-01-08T10:30:00Z",
+        "type": "delivered",
+        "line_items": [{ "id": "li_shoes", "quantity": 1 }],
+        "tracking_number": "123456789",
+        "tracking_url": "https://fedex.com/track/123456789",
+        "description": "Delivered to front door"
+      }
+    ]
+  },
+  "discounts": {
+    "applied": [
+      {
+        "code": "SAVE10",
+        "title": "$2.50 Off Running Shoes",
+        "amount": 250,
+        "allocations": [
+          { "path": "$.line_items[0]", "amount": 250 }
+        ]
+      }
+    ]
+  },
+  "totals": [
+    { "type": "subtotal", "amount": 3000 },
+    { "type": "items_discount", "amount": -250 },
+    { "type": "fulfillment", "amount": 800 },
+    { "type": "tax", "amount": 284 },
+    { "type": "total", "amount": 3834 }
   ]
 }
 ```

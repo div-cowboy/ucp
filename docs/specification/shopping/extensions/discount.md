@@ -316,7 +316,9 @@ with allocations to shipping/fees, contribute to `discount`.
 `sum(line_items[].totals[type=items_discount].amount)`.
 
 The `discounts.applied` array shows **what** was applied. The `totals[]` and
-`line_items[].totals[]` show **where** and **how much**.
+`line_items[].totals[]` show **where** and **how much**. When checkout
+completes, businesses MAY snapshot `discounts.applied` onto the resulting
+order as a durable record; see [Order — Discounts](../order/index.md#discounts).
 
 **Amount convention:** Discount amounts in `discounts.applied` are positive
 integers (the value of the discount). Discount entries in `totals[]` are

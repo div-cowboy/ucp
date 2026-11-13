@@ -104,6 +104,21 @@
       "description": "Snapshot of the policies that applied to the items at checkout, captured on the order as a durable record. `applies_to` targets are relative to the response root.",
       "ucp_request": "omit"
     },
+    "discounts": {
+      "type": "object",
+      "description": "Snapshot of the discounts that were applied at checkout, captured on the order as a durable record. Complements `totals` (the money math) with which code or automatic discount produced each reduction. Read-only on the order.",
+      "ucp_request": "omit",
+      "properties": {
+        "applied": {
+          "type": "array",
+          "items": {
+            "$ref": "discount.json#/$defs/applied_discount"
+          },
+          "description": "Discounts successfully applied (code-based and automatic).",
+          "ucp_request": "omit"
+        }
+      }
+    },
     "messages": {
       "type": "array",
       "items": {
