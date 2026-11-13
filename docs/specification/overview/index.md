@@ -3595,9 +3595,12 @@ every request:
     - Otherwise: Business **MUST** return a `version_unsupported`
         error.
 3. If capability negotiation yields no mutually supported version
-    for a capability required by the requested operation, the
-    business **MUST** return a `capabilities_incompatible` error
-    (see [Error Handling](#error-handling)).
+    for a capability that both parties advertise, the business
+    **MUST** return a `capabilities_incompatible` error
+    (see [Error Handling](#error-handling)). A capability omitted
+    from the platform profile does not bar the requested
+    operation. Independent of the intersection, a business
+    **MAY** refuse an operation according to its own policy.
 4. Businesses **MUST** include the negotiated protocol version in
     every response.
 
